@@ -6,7 +6,6 @@ downloaded to play it.
 
 ## How to install, compile, run (Linux)
 
-# Users install g++ and libsdl2-dev, run make, then ./tilda
 sudo apt-get install g++ libsdl2-dev
 make run
 
