@@ -1,0 +1,466 @@
+# ============================================================================================
+#  story.txt - every dialog, quest objective and story trigger of "The Legend of Tilda".
+#  Edit it with any text editor; press F5 in the game to reload it (this restarts the game).
+#
+#  STRUCTURE
+#    talk NAME         what a person says when Tilda talks (E) to them. NAME is a name from npcs.txt
+#                      (elder brothilda pip tunk raylin reg sheep dancer albino baron barkeeper maid knight
+#                      servant), or: chicken, sign, tunkfollower (Tunk after he joined)
+#    examine NAME      what Tilda finds when she examines (X) something in front of her:
+#                      books, bed, bar, table
+#    objective         the line on the Status page (the first matching block wins)
+#    trigger           something that starts by itself as soon as its conditions are true (once)
+#
+#  Inside a section:
+#    when COND COND ...   starts a block. The FIRST block whose conditions are all true is used.
+#    else                 a block without conditions (put it last)
+#    say NAME | text      one speech box. NAME "$" = the person talked to, empty = narrator text
+#    ---                  starts the next conversation of the same block: successive talks cycle
+#                         through them (conversation 1, 2, 3, 1, 2, ...)
+#    do COMMAND ARGS      runs when the conversation ends (see below)
+#    text ...             (objective blocks) the objective
+#
+#  CONDITIONS   var=N  var!=N  var<N  var>N  var<=N  var>=N   (no spaces; several are all required)
+#    quest        the main quest step (0..10)           kills      slimes beaten so far
+#    coins        weapon   0 none, 1 spoon, 2 spork, 3 sword
+#    sheepq       Reg's side quest 0/1/2               sheepfound sheep that are home (0..5)
+#    seenrealm    1 once Tilda left the cave           key        1 if Tilda has the cave key
+#    clues        how many clue_... flags are set      px, py     Tilda's position in tiles
+#    anything else is a flag of your own (0 until set), for example  book1=1
+#  TEXT can contain {kills}, {sheepfound}, {swordprice}, {clues}, ... (a variable in curly braces)
+#
+#  COMMANDS (do ...)
+#    set quest 7        set sheepq 1        set NAME 1 (your own flag)       add coins 25
+#    giveweapon 2       heal                 spawnking                        givekey
+#    spawndragon        (re)creates the dragon in its lair (once quest>=9) or Dina (once dina_found=1)
+#    tunkjoin           shop brothilda|reg   sheephome (the sheep talked to)  sfx jingle|coin|heal|hurt
+#    toast TEXT         fairy TEXT (Nagi says it)
+# ============================================================================================
+
+
+# ------------------------------------------------------------------ the village
+talk elder
+when quest=0
+say $ | Tilda! Thank goodness. King Slime snatched your little brother Tunk right out of his bed.
+say $ | It's dangerous to go alone! Take this spoon.
+say $ | Slimes have overrun the meadow south-east of here. Defeat five of them. Press Space to swing.
+do set quest 1
+do giveweapon 1
+do sfx jingle
+do toast Got the Wooden Spoon! Press Space to swing.
+when quest=1 kills>=5
+say $ | Five slimes! You are better with a spoon than I am with a ladle.
+say $ | Do you feel that rumble? King Slime has woken up, and he is guarding Tunk's cage.
+say $ | Take 30 coins. I also sharpened your spoon into the Master Spork. Go get your brother!
+do set quest 2
+do giveweapon 2
+do add coins 30
+do heal
+do spawnking
+do sfx jingle
+do toast +30 coins. Your spoon is now the Master Spork!
+when quest=1
+say $ | Slimes defeated: {kills} of 5.
+say $ | The meadow is south-east of the village. Follow the road east, then south.
+when quest=2
+say $ | King Slime sits in the meadow, next to Tunk's cage. He hits hard.
+say $ | Eat some of Brothilda's stew first.
+when quest=3
+say $ | King Slime is gone? Then Tunk's cage must have opened. Hurry to the meadow!
+when quest=4
+say $ | Tunk! Safe and sound! Tilda, you did it. The whole village owes you a bowl of stew.
+say $ | But King Slime was only the beginning. There are bigger quests out there, far beyond this village.
+say $ | Take this key. It opens the old gate at the east end of the road. Beyond it lies the Goblin Cave, a long tunnel into Baron Skalman's realm.
+say $ | Those goblins are tougher than slimes, and a spork will not be enough. Go and see Brothilda. She sells a proper short sword.
+say | Received: Cave Key. The old gate in the east can be opened now.
+do givekey
+do set quest 5
+do sfx jingle
+do fairy Hey Tilda, Brothilda sells a sword!
+when quest=5 weapon<3
+say $ | Brothilda sells a short sword for {swordprice} coins. You will want it in the Goblin Cave.
+say $ | Short on coins? Slimes and goblins drop a few.
+when quest>=10 elder_told=0
+say Tilda | Elder Maro, the dragon was Princess Dina. She hides in the ruin south of the castle, in a cave.
+say $ | The ruin... Then she chose well, or the old blood called her there. Sit down, Tilda. I was a Guardian once.
+say $ | The ruin was our castle. Below it lies a seal, and behind the seal sleeps something the Order of the Pale Moon calls the Master.
+say $ | Count Vex needs dragon blood to break it. I never told you, because I hoped it would never matter. I was wrong.
+say $ | Keep Dina safe, and keep your spork sharp. There is more to this than a wedding.
+do set elder_told 1
+do sfx jingle
+do toast The Elder was a Guardian of the seal (to be continued...)
+when quest>=10
+say $ | Dina holds the cave for now. Visit her, and find out what the Order is planning.
+else
+say $ | Follow the road east to the old gate. It leads through the Goblin Cave into Baron Skalman's realm.
+say $ | Tunk has your back. Goblins are tougher than slimes, so eat some stew first.
+
+talk brothilda
+when quest>=5 weapon<3
+say $ | Elder Maro sent you? Grumble, grumble. Then you need a real weapon.
+say $ | I have a short sword for {swordprice} coins. Take a look.
+do shop brothilda
+else
+say $ | Welcome. Grumble, grumble. Take a look at my wares.
+do shop brothilda
+
+talk pip
+when quest=0
+say $ | It's a secret to everybody.
+say $ | ...Fine. Elder Maro lives in the big house up the hill. He knows about Tunk.
+else
+say $ | Eating is good for your hearts.
+---
+say $ | Hit enemies with 'Space'.
+---
+say $ | Examine things with 'X'.
+---
+say $ | Be nice to chickens and NPCs.
+
+talk chicken
+else
+say Chicken | Bok bok! Bok!
+---
+say Chicken | Brrrk? (It eyes you suspiciously.)
+---
+say Chicken | Cluck cluck cluck... (It seems to be thinking about crossing the road.)
+---
+say Chicken | Bwaaak! (It would like you to please not hit it.)
+
+talk tunk
+when quest<3
+say $ | Hyaa! Hyah!
+say | Tunk is stuck in a cage with no door. King Slime has to go first.
+else
+say Tilda | Tunk! Are you hurt? Say something!
+say $ | Hyaa!
+say Tilda | That is not a sentence. But I'll take it.
+say $ | ...Hyah.
+do set quest 4
+do tunkjoin
+do sfx jingle
+
+talk tunkfollower
+else
+say Tunk | Hyaa!
+---
+say Tunk | Hyah hyah!
+---
+say Tunk | ...Hyah.
+---
+say Tunk | Hyaa! Hyaa!
+
+talk sign
+else
+say | A huge iron door with a red diamond on it. You hear distant laughter behind it.
+say | This must be the way into Baron Skalman's realm.
+say | The door does not budge. Your next quest begins here... (to be continued!)
+do set quest 6
+
+
+# ------------------------------------------------------------------ Baron Skalman's realm
+talk raylin
+when quest=5
+say $ | Nice day for fishing, aint it? Hua hua
+---
+say $ | Nice day for fishing, aint it? Hua hua
+---
+say $ | You are truly courageous adventurers. Head south to the castle of Baron Skalman;
+say $ | his daughter has been abducted by a dragon - and he will reward you handsomely if you bring her back...
+do set quest 6
+do sfx jingle
+do toast New quest: the castle of Baron Skalman, to the south!
+else
+say $ | Nice day for fishing, aint it? Hua hua
+---
+say $ | Nice day for fishing, aint it? Hua hua
+---
+say $ | You are truly courageous adventurers. Head south to the castle of Baron Skalman;
+say $ | his daughter has been abducted by a dragon - and he will reward you handsomely if you bring her back...
+
+talk reg
+when sheepq=0
+say $ | Well, hello there! Reg's the name, onions are the game.
+say $ | My onion stew heals you bit by bit. Rich in layers, just like me.
+say $ | But I'm in a pickle. My five sheep ran away. It was probably the smell. Could you find them for me?
+say $ | Talk to a sheep and it will trot home. I'll pay you well. Meanwhile, have a look at my stew.
+do set sheepq 1
+do sfx jingle
+do toast Side quest: find Reg's five sheep (0/5)
+do shop reg
+when sheepq=1 sheepfound>=5
+say $ | All five sheep are back in the pen! Baa-rilliant! Here, 25 coins for your trouble.
+say $ | Care for some stew while you are here?
+do set sheepq 2
+do add coins 25
+do sfx coin
+do toast +25 coins! Side quest complete.
+do shop reg
+when sheepq=1
+say $ | Any sheep yet? {sheepfound} of 5 are back home. They can't have gone far.
+do shop reg
+else
+say $ | Thanks again for the sheep! Hungry?
+do shop reg
+
+talk sheep
+when sheepq=1
+say Sheep | Baa! Baa!
+say | The sheep trots off towards Reg's farm.
+do sheephome
+do sfx coin
+do toast Sheep found: {sheepfound}/5
+else
+say Sheep | Baa?
+say | A lost-looking sheep. Somebody must be missing it.
+
+# ------------------------------------------------------------------ the Baron's castle (quests 7, 8 and 9)
+talk baron
+when quest<5
+say $ | Welcome, brave strangers! I am Baron Skalman, lord of this realm.
+say $ | My daughter, my dear Princess Dina, has been snatched away by a dragon! It came out of the storm yesterday.
+say $ | Bring her back and I shall reward you handsomely. The dragon's lair lies far to the south...
+when quest<7
+say $ | Welcome, brave strangers! I am Baron Skalman, lord of this realm.
+say $ | My daughter, my dear Princess Dina, has been snatched away by a dragon! It came out of the storm yesterday.
+say $ | Bring her back and I shall reward you handsomely. The dragon's lair lies far to the south...
+say $ | Ask around in my castle. Somebody may have seen something. And please, look through Dina's room. It is the last chamber, at the back.
+do set quest 7
+do sfx jingle
+do toast New quest: find out what happened to Princess Dina!
+when quest=7
+say $ | Any news of Dina, my daughter? Look around the castle. Ask my people, and search her room at the back.
+when quest=8
+say Tilda | Baron Skalman. I read Dina's books. Nobody kidnapped her. I think the dragon is Dina.
+say $ | ...
+say $ | Hush! Not so loud. The walls have ears, and some of them belong to Count Vex.
+say $ | You are right. When Dina was born, my father signed a contract with the Order of the Pale Moon. Her hand in marriage, to Count Vex, on her eighteenth birthday.
+say $ | A magical contract. If I break it, I lose my lands, my soul and, worse, my daughter. The Count is not a nice man. He is not even a nice count.
+say $ | The women of my family can turn into dragons. A very old secret. Dina turned herself into one and flew away from that wedding.
+say $ | I told everyone she was kidnapped, so the Count's men would hunt a monster and not my daughter. Find her, Tilda. Warn her before they do.
+say Tilda | Why does the Count want a bride so badly?
+say $ | I do not know. Something about the old seal in the south hills, and a 'Master' who waits. Please. Find her.
+do set quest 9
+do spawndragon
+do sfx jingle
+do toast New quest: find Dina. Follow the road south through the hills to the ruin!
+when quest=9
+say $ | Please find my daughter before the Count's men do. Follow the road south, through the hills, to the old ruin. Quickly.
+when quest>=10 baron_told=0
+say Tilda | Baron Skalman, I found Dina. She is alive and safe.
+say $ | Thank the heavens! Where? ...No, do not tell me. What I do not know, the Count cannot squeeze out of me.
+say $ | Take this purse. It is not enough, but it is all I can give you in secret. Come back if you learn how to break that contract.
+do add coins 50
+do set baron_told 1
+do sfx coin
+do toast +50 coins from the Baron
+else
+say $ | Dina is alive. That is all I need to know. Be careful, the Count's men are everywhere.
+
+talk maid
+when quest>=7 clue_maid=0
+say $ | Oh, you hunt the dragon? Mind the floor, I just scrubbed it!
+say $ | Princess Dina cried for a week after the letter came from Count Vex. And the Baron signed something with a trembling hand.
+say $ | Then, poof, a dragon. Funny, no window was broken, though.
+do set clue_maid 1
+do add coins 5
+do sfx coin
+do toast Clue: a letter from Count Vex made Dina cry (+5 coins)
+else
+say $ | Mind the floor, I just scrubbed it! The Baron's stew has been simmering since dawn.
+---
+say $ | Princess Dina's room is in the back. She is always buried in her books...
+---
+say $ | Since the dragon took her, the whole kitchen is in tears. And the onions don't help.
+
+talk servant
+when quest>=7 clue_servant=0
+say $ | The Baron locked himself in his study with a parchment sealed in red wax. A contract, I heard.
+say $ | With Count Vex's seal on it. He has not eaten since. Nobody asks how I am, but I notice things.
+do set clue_servant 1
+do add coins 5
+do sfx coin
+do toast Clue: the Baron signed a sealed contract with Count Vex (+5 coins)
+else
+say $ | Welcome to the great hall. Please wipe your boots.
+---
+say $ | The Baron has not slept since the princess vanished. Do help him.
+---
+say $ | I polish, I carry, I bow. Nobody ever asks how I am.
+
+talk knight
+when quest>=7 clue_knight=0
+say $ | The dragon? Strange beast. It burned nothing. Only the Count's carriage. And his hat.
+say $ | It flew past us with a tear in its eye. Dragons do not cry, do they?
+do set clue_knight 1
+do add coins 5
+do sfx coin
+do toast Clue: the dragon only burned Count Vex's carriage (+5 coins)
+else
+say $ | Halt! ...Oh, it's you. Carry on.
+---
+say $ | We guard the Baron. Mostly from the dragon. Mostly unsuccessfully.
+---
+say $ | This armour is far too hot for indoors. Do not tell the Baron I said that.
+
+talk albino
+when quest>=7 clue_albino=0
+say $ | Hisss. The dragon? I saw it rest by the south lake at dawn. Green scales, and a red ribbon in its mane.
+say $ | It muttered about 'page forty-two' of some book. Dragons that read. Hisss. The world is strange.
+do set clue_albino 1
+do add coins 5
+do sfx coin
+do toast Clue: the dragon had a red ribbon and talked about a book (+5 coins)
+else
+say $ | Hisss. Do not stare. The sun hates me and I hate the sun.
+say $ | Red eyes are very fashionable where I come from. Mind your own business, hero.
+---
+say $ | You seek the dragon? I saw it fly south, beyond the castle. Hisss.
+say $ | Be careful. Dragons do not like spoons.
+
+talk dancer
+when quest>=7 clue_dancer=0
+say $ | Count Vex's men tip well, darling. They asked me whether the princess ever left the castle by herself.
+say $ | And one of them said the Count does not even want her. He wants what is in her blood. Creepy, hm?
+do set clue_dancer 1
+do add coins 5
+do sfx coin
+do toast Clue: the Count wants something in Dina's blood (+5 coins)
+when coins>=1
+say $ | Oh, a coin for me? You are sweet, darling. Let me change the tune!
+do add coins -1
+do sfx coin
+do swapmusic
+---
+say $ | Another coin? Mmm, how about a different song this time?
+do add coins -1
+do sfx coin
+do swapmusic
+else
+say $ | Watch my hips, not my veils, hero!
+---
+say $ | All eyes are on me. Nobody noticed the dragon that flew over the castle yesterday.
+---
+say $ | Dancing is hard work. Throw a coin if you liked it. ...No? Then keep walking, darling.
+
+talk barkeeper
+when quest>=7 clue_barkeeper=0
+say $ | Count Vex's men drink here. Loud ones. They boast that after the wedding the Baron's lands belong to the Count.
+say $ | And that 'the Master' can finally wake. Tipsy nonsense, I hope. Another ale, hero?
+do set clue_barkeeper 1
+do add coins 5
+do sfx coin
+do toast Clue: Count Vex's men talk about a 'Master' (+5 coins)
+else
+say $ | What'll it be? Careful with the albino, he doesn't pay.
+---
+say $ | I serve the finest onion ale in the realm. Don't ask what else is in it.
+---
+say $ | The dancer brings the crowds, and the crowds bring the coins. Tip her, hero.
+
+examine books
+when quest>=7
+say | A closed book on Dina's table. The title says: "Shapeshifting for Dummies"
+do set book1 1
+---
+say | A closed book on Dina's table. The title says: "Surviving in the Wilderness"
+do set book2 1
+---
+say | A closed book on Dina's table. The title says: "Hidden Secrets and Caves"
+do set book3 1
+else
+say | A closed book. The title says: "Shapeshifting for Dummies"
+---
+say | A closed book. The title says: "Surviving in the Wilderness"
+---
+say | A closed book. The title says: "Hidden Secrets and Caves"
+
+examine bed
+when quest>=7
+say | A true princess' bed. It has not been slept in for days. There is a scorch mark on the pillow, and a single green scale.
+else
+say | A true princess' bed.
+
+examine bar
+else
+say | The bar counter. Sticky, and smells of onion ale.
+
+examine table
+else
+say | A sturdy wooden table.
+
+trigger
+when quest=7 px>=23 px<=31 py>=180 py<=185 hint_room=0
+say Nagi | Hey Tilda, this is Princess Dina's room. Those books on the table look interesting. Press X in front of them.
+do set hint_room 1
+
+trigger
+when quest=7 book1=1 book2=1 book3=1
+say Tilda | Shapeshifting for Dummies. Surviving in the Wilderness. Hidden Secrets and Caves...
+say Tilda | Nobody kidnapped Dina. She prepared this. A dragon that cries and burns only one carriage...
+say Tilda | Dina IS the dragon! She ran away from something.
+say Tunk | Hyaa?
+say Tilda | Yes, Tunk. A dragon princess. Let's ask the Baron what she ran away from.
+do set quest 8
+do sfx jingle
+do toast New quest: ask Baron Skalman about the contract!
+
+
+# ------------------------------------------------------------------ the dragon's lair (quest 9 and 10)
+trigger
+when quest=9 dina_found=1
+say Dina | Ow! Stop it! Stop hitting me, I give up! It's me, Dina!
+say Tilda | Princess Dina? You were the dragon?
+say Dina | Obviously. The women of my family can do it. Surprise! I am sorry about the fire. And the ramming. I panicked. Everybody who comes here wants to kill me.
+say Tilda | Your father sent us. He told me about the contract.
+say Dina | Then you know. Count Vex does not want a wife. He wants my dragon blood. The Order of the Pale Moon needs it to break the old seal beneath this ruin and wake 'the Master'.
+say Dina | That is why I hid here. This ruin was the castle of the Guardians of the Seal. As long as I am here and awake, nobody else can open it.
+say Tilda | Guardians? Elder Maro never said anything about that...
+say Dina | Then ask him. And tell my father I am alive, but not where. The Count's men are hunting dragons.
+say Tunk | Hyaa!
+say Dina | Your brother is lovely. Go now. I will hold the cave. Come back when you know more.
+do set quest 10
+do heal
+do sfx jingle
+do toast Chapter 1 complete: Dina is safe! (to be continued...)
+
+talk dina
+when quest>=10
+say $ | I will keep the cave sealed. Find out what the Order of the Pale Moon is planning, Tilda.
+---
+say $ | Have you talked to the Elder yet? He knows more than he says. They always do.
+---
+say $ | Do not tell my father where I am. And do not tell the Count anything at all.
+else
+say $ | ...
+
+# ------------------------------------------------------------------ the status page
+objective
+when quest=0
+text Find Elder Maro in the big house
+when quest=1 kills>=5
+text Return to Elder Maro
+when quest=1
+text Defeat slimes: {kills}/5
+when quest=2
+text Defeat King Slime
+when quest=3
+text Free Tunk from his cage
+when quest=4
+text Bring Tunk to Elder Maro
+when quest=5 seenrealm=0 weapon<3
+text Buy the short sword from Brothilda ({swordprice} coins)
+when quest=5 seenrealm=0
+text Follow the cave tunnel into Baron Skalman's realm
+when quest=5
+text Speak with Raylin by the lake
+when quest=6
+text Head south to Baron Skalman's castle
+when quest=7
+text Find out what happened to Dina (clues {clues}/6)
+when quest=8
+text Ask Baron Skalman about the contract
+when quest=9
+text Follow the road south to the ruin and find the dragon
+else
+text Talk to the Elder and the Baron about Dina (to be continued)

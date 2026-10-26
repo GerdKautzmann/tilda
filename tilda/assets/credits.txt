@@ -1,0 +1,22 @@
+# The credits page in the Esc menu. Edit freely and press F5 in the game to reload.
+# '#' = comment, "== Title" = gold heading, an empty line = a gap, "---" = start a new page.
+# A page holds 10 lines; long lines wrap by themselves. With several pages they turn every 5 seconds.
+
+== Legend of Tilda
+by Gerd Kautzmann
+
+Freeware and open source
+MIT license
+---
+== Inspiration
+Reg's and Raylin's lines are inspired
+by the comedy sketches of
+Viva La Dirt League (New Zealand).
+An unofficial fan tribute, not
+affiliated with them. Go watch them!
+---
+== Thanks
+SDL2 (zlib license)
+stb_image by Sean Barrett
+(public domain)
+"London Bridge" is a traditional song.

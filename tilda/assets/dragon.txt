@@ -1,0 +1,19 @@
+# The dragon's behaviour. One "name value" per line; '#' starts a comment. Press F5 in the game to reload.
+# The dragon waits in the middle of its cave. While it can SEE Tilda (inside `sight`, nothing in the way)
+# it spits fireballs. Whoever comes closer than `near` (Tilda or Tunk) gets rammed. After a ram it is
+# out of breath for `rest` seconds - the only time it can be hurt (unless only_hurt_when_resting is 0).
+
+hp 20                       # health; at 30 % it turns back into Princess Dina
+sight 150                   # pixels (one tile = 16)
+near 40                     # pixels: closer than this and it rams
+fire_every 2.2              # seconds between fireballs
+fire_speed 70               # pixels per second
+fire_count 1                # fireballs per volley (2 or 3 fly in a fan)
+fire_damage 1               # hearts
+ram_warn 0.6                # seconds of flashing before the ram
+ram_speed 130               # pixels per second
+ram_time 0.5                # seconds a ram lasts
+ram_damage 2                # hearts
+rest 2.5                    # seconds out of breath after a ram: hit it now!
+only_hurt_when_resting 1    # 1 = armour holds unless it is out of breath, 0 = can always be hurt
+home_speed 40               # pixels per second when it walks back to the middle of the cave

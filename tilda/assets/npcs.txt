@@ -1,0 +1,21 @@
+# The characters of The Legend of Tilda: one per line, 'name x y' (tile coordinates, as in world.bin).
+# Names: elder brothilda pip tunk raylin reg sheep dancer albino baron.   Press F5 in the game to reload.
+elder        7  40
+brothilda   26  40
+pip          7  12
+tunk        34  23
+raylin      25  78
+reg         28 198
+dancer      11 196
+albino       7 193
+baron       12 172
+knight      10 174
+knight      14 174
+servant      8 177
+maid        27 175
+barkeeper   16 199
+sheep        5  70
+sheep       10  90
+sheep       35  98
+sheep        7 108
+sheep       37 112
